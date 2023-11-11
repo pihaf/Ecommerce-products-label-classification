@@ -15,7 +15,8 @@ def excel_to_df(input_file_path, sheet_name):
     df = pd.read_excel(input_file_path, sheet_name=sheet_name)
     return df
 
-data = excel_to_df('main/validation_data.xlsx', 'test_data')
+# data = excel_to_df('main/validation_data.xlsx', 'test_data')
+data = pd.read_csv('main/final_data.csv')
 
 # Splitting labels and text descriptions
 labels = data['Label'].values
@@ -67,8 +68,8 @@ model.fit(train_padded_sequences, train_labels_one_hot, epochs=10, batch_size=32
 test_loss, test_accuracy = model.evaluate(test_padded_sequences, test_labels_one_hot)
 
 # Predicting on new data
-new_data = pd.read_csv('main/new_data.csv')
-new_sequences = tokenizer.texts_to_sequences(new_data['title'])
+validation_data = pd.read_csv('main/validation_data.csv')
+new_sequences = tokenizer.texts_to_sequences(validation_data['Product Name'])
 new_padded_sequences = pad_sequences(new_sequences, maxlen=max_length)
 predictions = model.predict(new_padded_sequences)
 predicted_labels = label_encoder.inverse_transform(np.argmax(predictions, axis=1))
@@ -84,7 +85,7 @@ print("Test Accuracy:", test_accuracy)
 # print("Predicted Labels:", predicted_labels)
 
 # Print predicted labels to a file
-product_name = new_data['title']
+product_name = validation_data['Product Name']
 temp_list = product_name.values.tolist()
 results = pd.DataFrame({'Label': predicted_labels, 'Product Name': temp_list})
 
