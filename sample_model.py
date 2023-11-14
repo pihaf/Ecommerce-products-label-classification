@@ -3,9 +3,11 @@ import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import classification_report
+#from sklearn.metrics import precision_score, recall_score, f1_score
 from tensorflow import keras
-from tensorflow.keras.preprocessing.text import Tokenizer
-from tensorflow.keras.preprocessing.sequence import pad_sequences
+from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.sequence import pad_sequences
+from keras.metrics import Precision, Recall, F1Score
 
 def df_to_excel(df, output_file_path, sheet_name):
     with pd.ExcelWriter(output_file_path, mode='a', engine='openpyxl') as writer:
@@ -16,7 +18,7 @@ def excel_to_df(input_file_path, sheet_name):
     return df
 
 # data = excel_to_df('main/validation_data.xlsx', 'test_data')
-data = pd.read_csv('main/final_data.csv')
+data = pd.read_csv('final_data.csv')
 
 # Splitting labels and text descriptions
 labels = data['Label'].values
@@ -59,16 +61,20 @@ model.add(keras.layers.Dense(64, activation='relu'))
 model.add(keras.layers.Dense(num_classes, activation='softmax'))
 
 # Compiling the model
+#model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 
 # Training the model
 model.fit(train_padded_sequences, train_labels_one_hot, epochs=10, batch_size=32)
 
+# Saving the model to a file
+model.save('model.h5')
+
 # Evaluating the model on the test data
 test_loss, test_accuracy = model.evaluate(test_padded_sequences, test_labels_one_hot)
 
 # Predicting on new data
-validation_data = pd.read_csv('main/validation_data.csv')
+validation_data = pd.read_csv('validation_data.csv')
 new_sequences = tokenizer.texts_to_sequences(validation_data['Product Name'])
 new_padded_sequences = pad_sequences(new_sequences, maxlen=max_length)
 predictions = model.predict(new_padded_sequences)
@@ -78,16 +84,15 @@ predicted_labels = label_encoder.inverse_transform(np.argmax(predictions, axis=1
 # test_predictions = model.predict(test_padded_sequences)
 # test_predicted_labels = label_encoder.inverse_transform(np.argmax(test_predictions, axis=1))
 # classification_report = classification_report(test_labels, np.argmax(test_predictions, axis=1), target_names=label_encoder.classes_)
+# test_precision = precision_score(test_labels, predicted_labels, average='weighted')
+# test_recall = recall_score(test_labels, predicted_labels, average='weighted')
+# test_f1 = f1_score(test_labels, predicted_labels, average='weighted')
+
 
 print("Test Loss:", test_loss)
 print("Test Accuracy:", test_accuracy)
+# print("Test Precision:", test_precision)
+# print("Test Recall:", test_recall)
+# print("Test F1 Score:", test_f1 )
 # print("Classification Report:", classification_report)
 # print("Predicted Labels:", predicted_labels)
-
-# Print predicted labels to a file
-product_name = validation_data['Product Name']
-temp_list = product_name.values.tolist()
-results = pd.DataFrame({'Label': predicted_labels, 'Product Name': temp_list})
-
-# Write the result dataframe to a new file
-results.to_csv('predicted_labels.csv', index=False)
