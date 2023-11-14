@@ -2,12 +2,11 @@ import numpy as np
 import pandas as pd
 from sklearn.preprocessing import LabelEncoder
 from sklearn.model_selection import train_test_split
-from sklearn.metrics import classification_report
-#from sklearn.metrics import precision_score, recall_score, f1_score
+from sklearn.metrics import precision_score, recall_score, f1_score
 from tensorflow import keras
 from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
-from keras.metrics import Precision, Recall, F1Score
+from keras.metrics import Recall, Precision, F1Score
 
 def df_to_excel(df, output_file_path, sheet_name):
     with pd.ExcelWriter(output_file_path, mode='a', engine='openpyxl') as writer:
@@ -26,6 +25,9 @@ descriptions = data['Product Name'].values
 
 # Combine training and test data into a single DataFrame
 combined_data = pd.DataFrame({'Label': labels, 'Product Name': descriptions})
+
+# Replace NaN values with empty strings
+combined_data['Product Name'] = combined_data['Product Name'].fillna('')
 
 # Apply label encoding to the combined data
 label_encoder = LabelEncoder()
@@ -61,8 +63,8 @@ model.add(keras.layers.Dense(64, activation='relu'))
 model.add(keras.layers.Dense(num_classes, activation='softmax'))
 
 # Compiling the model
-#model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
 model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy'])
+# model.compile(loss='categorical_crossentropy', optimizer='adam', metrics=['accuracy', Recall, Precision, F1Score])
 
 # Training the model
 model.fit(train_padded_sequences, train_labels_one_hot, epochs=10, batch_size=32)
@@ -71,28 +73,40 @@ model.fit(train_padded_sequences, train_labels_one_hot, epochs=10, batch_size=32
 model.save('model.h5')
 
 # Evaluating the model on the test data
-test_loss, test_accuracy = model.evaluate(test_padded_sequences, test_labels_one_hot)
+test_loss, test_accuracy, recall, precision, f1score = model.evaluate(test_padded_sequences, test_labels_one_hot)
+
+print("Test Loss:", test_loss)
+print("Test Accuracy:", test_accuracy)
+print("Test Recall:", recall)
+print("Test Precision:", precision)
+print("Test F1 Score:", f1score)
 
 # Predicting on new data
 validation_data = pd.read_csv('validation_data.csv')
+true_labels = validation_data['Label'].values
 new_sequences = tokenizer.texts_to_sequences(validation_data['Product Name'])
 new_padded_sequences = pad_sequences(new_sequences, maxlen=max_length)
 predictions = model.predict(new_padded_sequences)
 predicted_labels = label_encoder.inverse_transform(np.argmax(predictions, axis=1))
 
-# Calculate additional metrics for the test data
-# test_predictions = model.predict(test_padded_sequences)
-# test_predicted_labels = label_encoder.inverse_transform(np.argmax(test_predictions, axis=1))
-# classification_report = classification_report(test_labels, np.argmax(test_predictions, axis=1), target_names=label_encoder.classes_)
-# test_precision = precision_score(test_labels, predicted_labels, average='weighted')
-# test_recall = recall_score(test_labels, predicted_labels, average='weighted')
-# test_f1 = f1_score(test_labels, predicted_labels, average='weighted')
+# Evaluating accuracy and loss on new data
+new_loss, new_accuracy = model.evaluate(new_padded_sequences, keras.utils.to_categorical(true_labels, num_classes=num_classes))
 
+# Calculating recall, precision, and F1 score on new data
+new_recall = recall_score(true_labels, predicted_labels, average='weighted')
+new_precision = precision_score(true_labels, predicted_labels, average='weighted')
+new_f1score = f1_score(true_labels, predicted_labels, average='weighted')
 
-print("Test Loss:", test_loss)
-print("Test Accuracy:", test_accuracy)
-# print("Test Precision:", test_precision)
-# print("Test Recall:", test_recall)
-# print("Test F1 Score:", test_f1 )
-# print("Classification Report:", classification_report)
-# print("Predicted Labels:", predicted_labels)
+print("Loss after predicting: " + new_loss)
+print("Accuracy after predicting: " + new_accuracy)
+print("Recall after predicting: " + new_recall)
+print("Precision after predicting: " + new_precision)
+print("F1 Score after predicting: " + new_f1score)
+
+# Print predicted labels to a file
+product_name = validation_data['Product Name']
+temp_list = product_name.values.tolist()
+results = pd.DataFrame({'Label': predicted_labels, 'Product Name': temp_list})
+
+# Write the result dataframe to a new file
+results.to_csv('predicted_labels.csv', index=False)

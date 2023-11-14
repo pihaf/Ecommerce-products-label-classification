@@ -31,7 +31,6 @@ def find_common_labels(df1, df2, column1, column2):
 # Get data from files
 validation_data = pd.read_csv('validation_data.csv')
 final_data = pd.read_csv('final_data.csv')
-final_missing = pd.read_csv('final_missing2.csv')
 
 # # Read the text file
 # with open('missing_labels2.txt', 'r', encoding='utf-8') as file:
@@ -73,7 +72,7 @@ final_missing = pd.read_csv('final_missing2.csv')
 # df_unique.to_csv('final_Data.csv', index=False)
 
 # Check for different and common labels
-# common_labels = find_common_labels(validation_data, combined_df, 'Label', 'Label')
+# common_labels = find_common_labels(validation_data, final_data, 'Label', 'Label')
 # print('Total common labels: ' + str(len(common_labels)))
 # print(common_labels)
 
