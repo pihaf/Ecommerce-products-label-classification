@@ -93,6 +93,7 @@ predicted_labels = label_encoder.inverse_transform(np.argmax(predictions, axis=1
 new_recall = recall_score(true_labels, predicted_labels, average='weighted')
 new_precision = precision_score(true_labels, predicted_labels, average='weighted')
 new_f1score = f1_score(true_labels, predicted_labels, average='weighted')
+micro_f1 = f1_score(true_labels, predicted_labels, average='micro')
 
 print("Recall after predicting: ")
 print(new_recall)
@@ -100,6 +101,8 @@ print("Precision after predicting: ")
 print(new_precision)
 print("F1 Score after predicting: ")
 print(new_f1score)
+print("Micro F1:")
+print(micro_f1)
 
 # Print predicted labels to a file
 product_name = validation_data['Product Name']
