@@ -30,6 +30,7 @@ def find_common_labels(df1, df2, column1, column2):
 
 # Get data from files
 validation_data = pd.read_csv('validation_data.csv')
+full_data = pd.read_csv('full_data.csv')
 final_data = pd.read_csv('final_data.csv')
 
 # # Read the text file
@@ -72,14 +73,17 @@ print('Total labels: ' + str(final_data['Label'].nunique()))
 # df_unique.to_csv('final_Data.csv', index=False)
 
 # Check for different and common labels
-# common_labels = find_common_labels(validation_data, final_data, 'Label', 'Label')
-# print('Total common labels: ' + str(len(common_labels)))
+common_labels = find_common_labels(validation_data, final_data, 'Label', 'Label')
+print('Total common labels: ' + str(len(common_labels)))
 # print(common_labels)
 
 # Write missing labels to a file
-missing_labels = find_different_labels(validation_data, final_data, 'Label', 'Label')
-print('Total missing labels: ' + str(len(missing_labels)))
-print(missing_labels)
+different_labels = find_different_labels(final_data, validation_data, 'Label', 'Label')
+print('Total missing labels: ' + str(len(different_labels)))
+
+# Filter rows where 'Label' column contains values from 'different_labels'
+# df = final_data[~final_data['Label'].isin(different_labels)]
+# df.to_csv('new_data.csv', index=False)
 
 # with open("missing_labels3.txt", "w", encoding='utf-8') as file:
 #     for element in missing_labels:
