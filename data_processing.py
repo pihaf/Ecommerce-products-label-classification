@@ -41,8 +41,8 @@ final_data = pd.read_csv('final_data.csv')
 # df = pd.DataFrame({'Label': lines})
 
 # Total labels of data
-# print('Total labels: ' + str(validation_data['Label'].nunique()))
-# print('Total labels: ' + str(final_data['Label'].nunique()))
+print('Total labels: ' + str(validation_data['Label'].nunique()))
+print('Total labels: ' + str(final_data['Label'].nunique()))
 
 # print('Total labels: ' + str(final_missing['Label'].nunique()))
 
@@ -77,8 +77,9 @@ final_data = pd.read_csv('final_data.csv')
 # print(common_labels)
 
 # Write missing labels to a file
-# missing_labels = find_different_labels(df, final_missing, 'Label', 'Label')
-# print('Total missing labels: ' + str(len(missing_labels)))
+missing_labels = find_different_labels(validation_data, final_data, 'Label', 'Label')
+print('Total missing labels: ' + str(len(missing_labels)))
+print(missing_labels)
 
 # with open("missing_labels3.txt", "w", encoding='utf-8') as file:
 #     for element in missing_labels:
