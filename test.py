@@ -33,37 +33,52 @@
 
 # import pandas as pd
 
-# data = pd.read_csv('missing3.csv')
-# columns = ['start-url', 'title']
+# data = pd.read_csv('new.csv')
+# columns = ['link2', 'title2']
 # new = data[columns]
-# new.to_csv('missing2.csv', index=False)
+# new.to_csv('new2.csv', index=False)
 
-import urllib.parse
+# import urllib.parse
+# import pandas as pd
+
+# # Read the CSV file
+# df = pd.read_csv('missing2.csv')
+
+# # Function to remove the specified part from the URL
+# def remove_part(url):
+#     return url.replace('https://vatgia.com/home/', '')
+
+# # Function to decode URL-encoded string to UTF-8 and capitalize the first letter
+# def decode_and_capitalize(url):
+#     utf8_string = urllib.parse.unquote(url, encoding='utf-8')
+#     result = utf8_string.replace('+', ' ')
+#     result = result.capitalize()
+#     return result
+
+# def remove_tail(url):
+#     return url.replace('.spvg', '')
+
+# # Remove the specified part from the URLs in the first column
+# df['start-url'] = df['start-url'].apply(remove_part)
+
+# # Replace URLs in the first column with the decoded and capitalized strings
+# df['start-url'] = df['start-url'].apply(decode_and_capitalize)
+
+# df['start-url'] = df['start-url'].apply(remove_tail)
+
+# df.to_csv('final_missing2.csv', index=False)
+
 import pandas as pd
 
-# Read the CSV file
-df = pd.read_csv('missing2.csv')
+# Read the text file
+with open('product_test_unlabeled.txt', 'r', encoding='utf-8') as file:
+    lines = file.readlines()
 
-# Function to remove the specified part from the URL
-def remove_part(url):
-    return url.replace('https://vatgia.com/home/', '')
+# Remove newline characters and create a list of labels
+labels = [line.strip() for line in lines]
 
-# Function to decode URL-encoded string to UTF-8 and capitalize the first letter
-def decode_and_capitalize(url):
-    utf8_string = urllib.parse.unquote(url, encoding='utf-8')
-    result = utf8_string.replace('+', ' ')
-    result = result.capitalize()
-    return result
+# Create a dataframe with 'Label' column
+df = pd.DataFrame({'Label': labels})
 
-def remove_tail(url):
-    return url.replace('.spvg', '')
-
-# Remove the specified part from the URLs in the first column
-df['start-url'] = df['start-url'].apply(remove_part)
-
-# Replace URLs in the first column with the decoded and capitalized strings
-df['start-url'] = df['start-url'].apply(decode_and_capitalize)
-
-df['start-url'] = df['start-url'].apply(remove_tail)
-
-df.to_csv('final_missing2.csv', index=False)
+# Save the dataframe to a CSV file
+df.to_csv('output.csv', index=False)

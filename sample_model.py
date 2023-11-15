@@ -79,7 +79,7 @@ print("Test Loss:", test_loss)
 print("Test Accuracy:", test_accuracy)
 
 # Predicting on new data
-validation_data = pd.read_csv('validation_data.csv')
+validation_data = pd.read_csv('validation.csv')
 true_labels = validation_data['Label'].values
 new_sequences = tokenizer.texts_to_sequences(validation_data['Product Name'])
 new_padded_sequences = pad_sequences(new_sequences, maxlen=max_length)
@@ -90,19 +90,19 @@ predicted_labels = label_encoder.inverse_transform(np.argmax(predictions, axis=1
 #new_loss, new_accuracy = model.evaluate(new_padded_sequences, keras.utils.to_categorical(true_labels, num_classes=num_classes))
 
 # Calculating recall, precision, and F1 score on new data
-new_recall = recall_score(true_labels, predicted_labels, average='weighted')
-new_precision = precision_score(true_labels, predicted_labels, average='weighted')
-new_f1score = f1_score(true_labels, predicted_labels, average='weighted')
-micro_f1 = f1_score(true_labels, predicted_labels, average='micro')
+# new_recall = recall_score(true_labels, predicted_labels, average='weighted')
+# new_precision = precision_score(true_labels, predicted_labels, average='weighted')
+# new_f1score = f1_score(true_labels, predicted_labels, average='weighted')
+# micro_f1 = f1_score(true_labels, predicted_labels, average='micro')
 
-print("Recall after predicting: ")
-print(new_recall)
-print("Precision after predicting: ")
-print(new_precision)
-print("F1 Score after predicting: ")
-print(new_f1score)
-print("Micro F1:")
-print(micro_f1)
+# print("Recall after predicting: ")
+# print(new_recall)
+# print("Precision after predicting: ")
+# print(new_precision)
+# print("F1 Score after predicting: ")
+# print(new_f1score)
+# print("Micro F1:")
+# print(micro_f1)
 
 # Print predicted labels to a file
 product_name = validation_data['Product Name']
