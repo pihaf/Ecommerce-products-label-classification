@@ -73,13 +73,10 @@ model.fit(train_padded_sequences, train_labels_one_hot, epochs=10, batch_size=32
 model.save('model.h5')
 
 # Evaluating the model on the test data
-test_loss, test_accuracy, recall, precision, f1score = model.evaluate(test_padded_sequences, test_labels_one_hot)
+test_loss, test_accuracy = model.evaluate(test_padded_sequences, test_labels_one_hot)
 
 print("Test Loss:", test_loss)
 print("Test Accuracy:", test_accuracy)
-print("Test Recall:", recall)
-print("Test Precision:", precision)
-print("Test F1 Score:", f1score)
 
 # Predicting on new data
 validation_data = pd.read_csv('validation_data.csv')
@@ -90,18 +87,19 @@ predictions = model.predict(new_padded_sequences)
 predicted_labels = label_encoder.inverse_transform(np.argmax(predictions, axis=1))
 
 # Evaluating accuracy and loss on new data
-new_loss, new_accuracy = model.evaluate(new_padded_sequences, keras.utils.to_categorical(true_labels, num_classes=num_classes))
+#new_loss, new_accuracy = model.evaluate(new_padded_sequences, keras.utils.to_categorical(true_labels, num_classes=num_classes))
 
 # Calculating recall, precision, and F1 score on new data
 new_recall = recall_score(true_labels, predicted_labels, average='weighted')
 new_precision = precision_score(true_labels, predicted_labels, average='weighted')
 new_f1score = f1_score(true_labels, predicted_labels, average='weighted')
 
-print("Loss after predicting: " + new_loss)
-print("Accuracy after predicting: " + new_accuracy)
-print("Recall after predicting: " + new_recall)
-print("Precision after predicting: " + new_precision)
-print("F1 Score after predicting: " + new_f1score)
+print("Recall after predicting: ")
+print(new_recall)
+print("Precision after predicting: ")
+print(new_precision)
+print("F1 Score after predicting: ")
+print(new_f1score)
 
 # Print predicted labels to a file
 product_name = validation_data['Product Name']
