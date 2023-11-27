@@ -8,6 +8,39 @@ def excel_to_df(input_file_path, sheet_name):
     df = pd.read_excel(input_file_path, sheet_name=sheet_name)
     return df
 
+def txt_to_csv(input_file, outputfile):
+    # Read the text file into a DataFrame
+    with open(input_file, 'r', encoding='utf-8') as file:
+        data = file.read().splitlines()
+
+    labels = []
+    products = []
+    for line in data:
+        parts = line.split(' ', 1)  # Split into two parts: label and product name
+        if len(parts) == 2:
+            label, product_name = parts
+            label = label.replace('__label__', '').replace('_', ' ')
+            labels.append(label.strip())
+            products.append(product_name.strip())
+    
+    df = pd.DataFrame({'Label': labels, 'Product Name': products})
+    df.to_csv(outputfile, index=False)
+
+def csv_to_txt(input_file, output_file):
+    # Read the CSV file into a dataframe
+    df = pd.read_csv(input_file)
+
+    # Iterate through each row of the dataframe
+    with open(output_file, 'w', encoding='utf-8') as f:
+        for index, row in df.iterrows():
+            value1 = str(row['Label']) 
+            value2 = str(row['Product Name'])
+            new_value1 = value1.replace(' ', '_')
+            line = f"__label__{new_value1} {value2}\n"
+            
+            # Write the line to the text file
+            f.write(line)
+
 def find_different_labels(df1, df2, column1, column2):
     # Extract the unique values of the column from both dataframes
     df1_values = set(df1[column1].unique())
@@ -29,34 +62,17 @@ def find_common_labels(df1, df2, column1, column2):
     return common_values
 
 # Get data from files
-validation_data = pd.read_csv('validation_data.csv')
-full_data = pd.read_csv('full_data.csv')
-final_data = pd.read_csv('final_data.csv')
-
-# # Read the text file
-# with open('missing_labels2.txt', 'r', encoding='utf-8') as file:
-#     lines = file.readlines()
-
-# lines = [line.strip() for line in lines]
-# # Create a dataframe with 'Label' column
-# df = pd.DataFrame({'Label': lines})
+validation_data = pd.read_csv('data/validation_data.csv')
+final_data = pd.read_csv('data/final_products_vg.csv')
+full_data = pd.read_csv('data/full_products_vg.csv')
 
 # Total labels of data
 print('Total labels: ' + str(validation_data['Label'].nunique()))
 print('Total labels: ' + str(final_data['Label'].nunique()))
 
-# print('Total labels: ' + str(final_missing['Label'].nunique()))
+#csv_to_txt('predicted_labels_final.csv', 'nhom10_sol3.txt')
 
-# columns = ['link1', 'link2', 'title']
-# new_data = data[columns]
-# new_data = new_data.copy()
-# new_data['link1'] = new_data['link1'].str.replace('"', '')
-# new_data['link2'] = new_data['link2'].str.replace('"', '')
-# new_data['title'] = new_data['title'].str.replace('"', '')
-# print(new_data.head())
-# new_data.to_csv('new_data.csv', index=False)
-
-# Check and remove NaN
+# Check for NaN
 # print("Rows with NaN values:")
 # print(final_data[final_data.isna().any(axis=1)])
 
@@ -70,22 +86,21 @@ print('Total labels: ' + str(final_data['Label'].nunique()))
 
 # Remove duplicates
 # df_unique = final_data.drop_duplicates()
-# df_unique.to_csv('final_Data.csv', index=False)
+# df_unique.to_csv('final_products_vg.csv', index=False)
 
-# Check for different and common labels
+# Check for common labels
 common_labels = find_common_labels(validation_data, final_data, 'Label', 'Label')
 print('Total common labels: ' + str(len(common_labels)))
-# print(common_labels)
 
-# Write missing labels to a file
+# Check for different labels
 different_labels = find_different_labels(final_data, validation_data, 'Label', 'Label')
 print('Total missing labels: ' + str(len(different_labels)))
 
-# Filter rows where 'Label' column contains values from 'different_labels'
-# df = final_data[~final_data['Label'].isin(different_labels)]
-# df.to_csv('new_data.csv', index=False)
+# Remove data that have different labels than validation data
+# final_data = final_data[~final_data['Label'].isin(different_labels)]
+# final_data.to_csv('final_products_vg.csv', index=False)
 
-# with open("missing_labels3.txt", "w", encoding='utf-8') as file:
+# Write missing labels to a file
+# with open("missing_labels.txt", "w", encoding='utf-8') as file:
 #     for element in missing_labels:
 #         file.write(element + "\n")
-
